@@ -1,35 +1,61 @@
 #include "BrickMesh.h"
+#include "ViewBase.h"
+
+static std::map<Lookup, Variations> cache;
+
+static int orderedCompare(const G3D::Vector3& a, const G3D::Vector3& b)
+{
+	if (a.x < b.x)
+		return -1;
+	if (a.x > b.x)
+		return 1;
+	
+	if (a.y < b.y)
+		return -1;
+	if (a.y > b.y)
+		return 1;
+
+	if (a.z < b.z)
+		return -1;
+	if (a.z > b.z)
+		return 1;
+
+	return 0;
+}
+
+static void appendTriangles(G3D::ReferenceCountedPointer<RBX::Render::Mesh::Level>& level, int a, int b, int c, int d);
 
 namespace RBX
 {
 	namespace View
 	{
-		void BevelMesh::Builder::build(Purpose purpose)
+		const float BrickMesh::widthInset = 0.0f;
+		const float BrickMesh::normalPerturbation = 0.05f;
+		const float BrickMesh::bevel = 0.0f;
+
+		void BrickMesh::flushCache()
 		{
-			LevelBuilder::build(purpose);
-			if (bevel > 0.0f)
+			cache.clear();
+		}
+
+		G3D::ReferenceCountedPointer<Render::Mesh> BrickMesh::create(const G3D::Vector3& size, RenderSurfaceTypes surfaceTypes, BrickColor color)
+		{
+			Lookup lookup = {size, surfaceTypes, color};
+
+			Variations& variation = cache[lookup];
+			
+			size_t mesh = variation.count == 4 ? G3D::iRandom(0, 3) : G3D::min(3, G3D::iRandom(0, 8));
+
+			G3D::ReferenceCountedPointer<Render::Mesh> thisMesh = variation.meshes[mesh];
+
+			if (thisMesh.isNull())
 			{
-				appendQuadFromIndexArray( 0,  3,  5,  4);
-				appendQuadFromIndexArray( 4,  7,  8, 11);
-				appendQuadFromIndexArray(11, 10,  1,  0);
-				appendQuadFromIndexArray( 7,  6, 12, 15);
-				appendQuadFromIndexArray(16, 19, 10,  9);
-				appendQuadFromIndexArray( 3,  2, 21, 20);
-				appendQuadFromIndexArray(19, 18,  2,  1);
-				appendQuadFromIndexArray( 6,  5, 20, 23);
-				appendQuadFromIndexArray(15, 14,  9,  8);
-				appendQuadFromIndexArray(14, 13, 17, 16);
-				appendQuadFromIndexArray(18, 17, 22, 21);
-				appendQuadFromIndexArray(23, 22, 13, 12);
-				appendQuadFromIndexArray( 0,  4, 11);
-				appendQuadFromIndexArray( 5,  3, 20);
-				appendQuadFromIndexArray( 1, 10, 19);
-				appendQuadFromIndexArray( 2, 18, 21);
-				appendQuadFromIndexArray(15,  8,  7);
-				appendQuadFromIndexArray(12,  6, 23);
-				appendQuadFromIndexArray(14, 16,  9);
-				appendQuadFromIndexArray(13, 22, 17);
+				thisMesh = new BrickMesh(size, surfaceTypes, color);
+				variation.meshes[mesh] = thisMesh;
+				variation.count++;
 			}
+
+			return thisMesh;
 		}
 	}
 }
