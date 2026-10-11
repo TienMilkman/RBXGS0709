@@ -127,28 +127,30 @@ namespace RBX
 
 	Face Face::projectOverlapOnMe(const Face& other) const
 	{
-		G3D::Vector3 normal = getU();
-		G3D::Vector3 v2 = getV();
+		G3D::Vector3 u = getU();
+		G3D::Vector3 v = getV();
 
 		float minL[2];
 		float maxL[2];
 		for (int i = 0; i < 2; ++i)
 		{
+			const G3D::Vector3& axis = i == 0 ? u : v;
+
 			float f0min, f0max;
-			this->minMax(this->c0, normal, f0min, f0max);
+			this->minMax(this->c0, axis, f0min, f0max);
 
 			float f1min, f1max;
-			other.minMax(this->c0, normal, f1min, f1max);
+			other.minMax(this->c0, axis, f1min, f1max);
 
-			minL[i] = G3D::min(f0min, f1min);
-			maxL[i] = G3D::max(f0max, f1max);
+			minL[i] = G3D::max(f0min, f1min);
+			maxL[i] = G3D::min(f0max, f1max);
 		}
 
 		return Face(
-			(normal * minL[1]) + (v2 * minL[1]) + this->c0,
-			(normal * minL[1]) + (v2 * minL[0]) + this->c0,
-			(normal * maxL[1]) + (v2 * minL[0]) + this->c0,
-			(normal * maxL[1]) + (v2 * minL[1]) + this->c0);
+			(u * minL[0]) + (v * minL[1]) + this->c0,
+			(u * maxL[0]) + (v * minL[1]) + this->c0,
+			(u * maxL[0]) + (v * maxL[1]) + this->c0,
+			(u * minL[0]) + (v * maxL[1]) + this->c0);
 	}
 
 	Face Face::fromExtentsSide(const Extents& e, NormalId faceId)
