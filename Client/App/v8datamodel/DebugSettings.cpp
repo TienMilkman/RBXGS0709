@@ -20,8 +20,8 @@ static RBX::Reflection::PropDescriptor<RBX::DebugSettings, bool> prop_DisableSle
 static RBX::Reflection::PropDescriptor<RBX::DebugSettings, bool> prop_DisableEnvironmentalThrottle("DisableEnvironmentalThrottle", "Display", &RBX::DebugSettings::getDisableEnvironmentalThrottle, &RBX::DebugSettings::setDisableEnvironmentalThrottle, RBX::Reflection::PropertyDescriptor::STANDARD);
 
 static RBX::Reflection::PropDescriptor<RBX::DebugSettings, bool> prop_ValidatingDebug("ValidatingDebug", "Errors", &RBX::DebugSettings::getValidatingDebug, &RBX::DebugSettings::setValidatingDebug, RBX::Reflection::PropertyDescriptor::STANDARD);
-static RBX::Reflection::PropDescriptor<RBX::DebugSettings, RBX::Debugable::AssertAction> prop_assertAction("AssertAction", "Errors", &RBX::DebugSettings::getAssertAction, &RBX::DebugSettings::setAssertAction, RBX::Reflection::PropertyDescriptor::STANDARD);
-static RBX::Reflection::PropDescriptor<RBX::DebugSettings, RBX::DebugSettings::ErrorReporting> prop_errorReporting("errorReporting", "Errors", &RBX::DebugSettings::getErrorReporting, &RBX::DebugSettings::setErrorReporting, RBX::Reflection::PropertyDescriptor::STANDARD);
+static RBX::Reflection::EnumPropDescriptor<RBX::DebugSettings, RBX::Debugable::AssertAction> prop_assertAction("AssertAction", "Errors", &RBX::DebugSettings::getAssertAction, &RBX::DebugSettings::setAssertAction, RBX::Reflection::PropertyDescriptor::STANDARD);
+static RBX::Reflection::EnumPropDescriptor<RBX::DebugSettings, RBX::DebugSettings::ErrorReporting> prop_errorReporting("errorReporting", "Errors", &RBX::DebugSettings::getErrorReporting, &RBX::DebugSettings::setErrorReporting, RBX::Reflection::PropertyDescriptor::STANDARD);
 
 static RBX::Reflection::PropDescriptor<RBX::DebugSettings, float> prop_shaderModel("ShaderModel", "Profile", &RBX::DebugSettings::shaderModel, NULL, RBX::Reflection::PropertyDescriptor::STANDARD);
 static RBX::Reflection::PropDescriptor<RBX::DebugSettings, int> prop_videoMemory("VideoMemory", "Profile", &RBX::DebugSettings::videoMemory, NULL, RBX::Reflection::PropertyDescriptor::STANDARD);
@@ -38,6 +38,8 @@ RBX::Reflection::BoundProp<bool, 1> prop_SoundWarnings("SoundWarnings", "Errors"
 
 namespace RBX
 {
+	const char* const sDebugSettings = "DebugSettings";
+
 	DebugSettings::DebugSettings()
 		: stackTracingEnabled(true),
 		  ioEnabled(false),
@@ -283,5 +285,23 @@ namespace RBX
 		GetVersionExA(&osvi);
 
 		return osvi.dwPlatformId;
+	}
+
+	namespace Reflection
+	{
+		EnumDesc<DebugSettings::ErrorReporting>::EnumDesc()
+			: EnumDescriptor("ErrorReporting", typeid(DebugSettings::ErrorReporting))
+		{
+			addPair(DebugSettings::DontReport, "DontReport");
+			addPair(DebugSettings::Prompt, "Prompt");
+			addPair(DebugSettings::Report, "Report");
+		}
+
+		EnumDesc<Debugable::AssertAction>::EnumDesc()
+			: EnumDescriptor("AssertAction", typeid(Debugable::AssertAction))
+		{
+			addPair(Debugable::CrashOnAssert, "CrashOnAssert");
+			addPair(Debugable::IgnoreAssert, "IgnoreAssert");
+		}
 	}
 }
