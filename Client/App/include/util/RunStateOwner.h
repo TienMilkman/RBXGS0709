@@ -77,6 +77,7 @@ namespace RBX
 					   public Notifier<RunService, RunTransition>,
 					   public Notifier<RunService, RunState>
 	{
+	friend DataModel;
 	private:
 		RunState runState;
 		boost::mutex runMutex;
@@ -119,10 +120,22 @@ namespace RBX
 		void endRunThread(bool join);
 		void raiseHeartbeat(float time, float step);
 		void raiseStepped(float time, float step);
-		RunState getRunState() const;
-		bool isEditState() const;
-		bool isRunState() const;
-		bool isPauseState() const;
+		RunState getRunState() const
+		{
+			return runState;
+		}
+		bool isEditState() const
+		{
+			return runState == RS_NORMAL;
+		}
+		bool isRunState() const
+		{
+			return runState == RS_RUNNING;
+		}
+		bool isPauseState() const
+		{
+			return runState == RS_PAUSED;
+		}
 		void setPeriod(float);
 		float getPeriod();
 		void addRunView(IRunView*);
