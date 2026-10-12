@@ -13,6 +13,6 @@ You can create the [objdiff](https://github.com/encounter/objdiff) project by ex
 * [Graphics3D 6.09](https://sourceforge.net/projects/g3d/files/g3d-cpp/6.09/)
 
 # TO DO
-Gameservers -[ ]
+Gameservers -[x]
 
 Renders -[x]
