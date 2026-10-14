@@ -67,7 +67,7 @@ namespace RBX
 
 		class Replicator : public DescribedNonCreatable<Replicator, IdSerializer, &sReplicator>, public PluginInterface
 		{
-			class Item : private boost::noncopyable
+			class __declspec(novtable) Item : private boost::noncopyable
 			{
 			public:
 				enum ItemType
@@ -88,7 +88,9 @@ namespace RBX
 				{
 				}
 			public:
-				virtual ~Item();
+				virtual ~Item()
+				{
+				}
 				virtual void write(RakNet::BitStream& bitStream) = 0;
 				
 			public:
@@ -173,8 +175,8 @@ namespace RBX
 				const boost::shared_ptr<Replicator> replicator;
 				const RakNetStatistics* statistics;
 			public:
-				size_t instanceCount;
-				size_t instanceBits;
+				unsigned instanceCount;
+				unsigned instanceBits;
 
 			public:
 				ReplicatorStatsItem(const boost::shared_ptr<Replicator>& replicator, const RakNetStatistics* statistics);
